@@ -91,18 +91,16 @@ such as Pacemaker.
 	--enable-fatal-warnings=yes \
 	--with-daemon-group=haclient \
 	--with-daemon-user=hacluster\
-	--docdir=%{_docdir}/%{name}-%{version}
-%{__make} -j1
+	--docdir=%{_docdir}/%{name}-%{version} \
+	--disable-static
+%{__make}
 
 %install
 rm -rf $RPM_BUILD_ROOT
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
 
-## tree fix up
-# Dont package static libs
-find $RPM_BUILD_ROOT -name '*.a' -exec rm {} \;
-find $RPM_BUILD_ROOT -name '*.la' -exec rm {} \;
+find $RPM_BUILD_ROOT -name '*.la' -delete
 
 %clean
 rm -rf $RPM_BUILD_ROOT

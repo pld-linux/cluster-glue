@@ -23,6 +23,7 @@ BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	bzip2-devel
 BuildRequires:	curl-devel
+BuildRequires:	docbook-dtd44-xml
 #BuildRequires:	docbook-dtds
 BuildRequires:	docbook-style-xsl
 BuildRequires:	glib2-devel
@@ -32,12 +33,14 @@ BuildRequires:	libstdc++-devel
 BuildRequires:	libtool
 BuildRequires:	libuuid-devel
 BuildRequires:	libxml2-devel
-BuildRequires:	libxslt
+BuildRequires:	libxslt-progs
+BuildRequires:	ncurses-devel
 BuildRequires:	net-snmp-devel >= 5.4
 BuildRequires:	openhpi-devel
 BuildRequires:	openssl-devel
 BuildRequires:	pkgconfig
 BuildRequires:	python-devel
+BuildRequires:	rpm-pythonprov
 BuildRequires:	which
 Requires:	perl-TimeDate
 # Directives to allow upgrade from combined heartbeat packages

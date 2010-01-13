@@ -7,6 +7,7 @@
 #   gmake[4]: Leaving directory `/home/users/glen/rpm/BUILD.x86_64-linux/cluster-glue-1.0.2-rc2/lib/plugins/stonith'
 # - pld deps for "docbook-dtds"
 # - tests packaged in -devel to own pkg or just rm -rf
+# - pldize ha_logd initscript (look heartbeat.init?)
 %define		subver	rc2
 %define		rel		0.1
 Summary:	Reusable cluster components
@@ -42,7 +43,17 @@ BuildRequires:	pkgconfig
 BuildRequires:	python-devel
 BuildRequires:	rpm-pythonprov
 BuildRequires:	which
+Requires(post,preun):	/sbin/chkconfig
+Requires(postun):	/usr/sbin/groupdel
+Requires(postun):	/usr/sbin/userdel
+Requires(pre):	/bin/id
+Requires(pre):	/usr/bin/getgid
+Requires(pre):	/usr/sbin/groupadd
+Requires(pre):	/usr/sbin/useradd
 Requires:	perl-TimeDate
+Requires:	rc-scripts
+Provides:	group(haclient)
+Provides:	user(hacluster)
 # Directives to allow upgrade from combined heartbeat packages
 Provides:	heartbeat-pils = 3.0.0-1
 Provides:	heartbeat-stonith = 3.0.0-1
@@ -108,6 +119,26 @@ find $RPM_BUILD_ROOT -name '*.la' -delete
 %clean
 rm -rf $RPM_BUILD_ROOT
 
+%pre
+%groupadd -g 60 haclient
+%useradd -u 17 -d /var/lib/heartbeat/cores/hacluster -c "Heartbeat User" -g haclient hacluster
+
+%post
+/sbin/chkconfig --add logd
+%service logd restart
+
+%preun
+if [ "$1" = "0" ]; then
+	%service -q logd stop
+	/sbin/chkconfig --del logd
+fi
+
+%postun
+if [ "$1" = "0" ]; then
+	%userremove hacluster
+	%groupremove haclient
+fi
+
 %post	libs -p /sbin/ldconfig
 %postun	libs -p /sbin/ldconfig
 
@@ -157,7 +188,6 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_var}/lib/heartbeat
 %dir %{_var}/lib/heartbeat/cores
 %dir %attr(700,root,root) %{_var}/lib/heartbeat/cores/root
-%dir %attr(700,nobody,nobody) %{_var}/lib/heartbeat/cores/nobody
 %dir %attr(700,hacluster,haclient) %{_var}/lib/heartbeat/cores/hacluster
 
 %files libs

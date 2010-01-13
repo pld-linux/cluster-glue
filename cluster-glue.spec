@@ -5,12 +5,11 @@
 #   collect2: ld returned 1 exit status
 #   gmake[4]: *** [ipmilantest] Error 1
 #   gmake[4]: Leaving directory `/home/users/glen/rpm/BUILD.x86_64-linux/cluster-glue-1.0.2-rc2/lib/plugins/stonith'
-# - pld deps for "docbook-dtds"
 # - tests packaged in -devel to own pkg or just rm -rf
 # - pldize ha_logd initscript (look heartbeat.init?)
 # - stonith-libs? pils?
 %define		subver	rc2
-%define		rel		0.1
+%define		rel		0.2
 Summary:	Reusable cluster components
 Name:		cluster-glue
 Version:	1.0.2
@@ -27,7 +26,6 @@ BuildRequires:	automake
 BuildRequires:	bzip2-devel
 BuildRequires:	curl-devel
 BuildRequires:	docbook-dtd44-xml
-#BuildRequires:	docbook-dtds
 BuildRequires:	docbook-style-xsl
 BuildRequires:	glib2-devel
 BuildRequires:	libltdl-devel
@@ -73,7 +71,6 @@ STONITH devices.
 %package libs
 Summary:	Reusable cluster libraries
 Group:		Development/Libraries
-Requires:	%{name} = %{version}-%{release}
 Obsoletes:	libheartbeat2
 
 %description libs

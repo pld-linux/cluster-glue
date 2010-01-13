@@ -9,7 +9,7 @@
 # - pldize ha_logd initscript (look heartbeat.init?)
 # - stonith-libs? pils?
 %define		subver	rc2
-%define		rel		0.2
+%define		rel		0.3
 Summary:	Reusable cluster components
 Name:		cluster-glue
 Version:	1.0.2
@@ -50,6 +50,7 @@ Requires(pre):	/bin/id
 Requires(pre):	/usr/bin/getgid
 Requires(pre):	/usr/sbin/groupadd
 Requires(pre):	/usr/sbin/useradd
+Requires:	%{name}-libs = %{version}-%{release}
 Requires:	perl-TimeDate
 Requires:	rc-scripts
 Provides:	group(haclient)
@@ -80,7 +81,6 @@ such as Pacemaker.
 %package libs-devel
 Summary:	Headers and libraries for writing cluster managers
 Group:		Development/Libraries
-Requires:	%{name} = %{version}-%{release}
 Requires:	%{name}-libs = %{version}-%{release}
 Obsoletes:	libheartbeat-devel
 
@@ -256,6 +256,7 @@ fi
 %attr(755,root,root) %{_datadir}/%{name}/lrmtest/testcases/*.sh
 
 %files stonith
+%defattr(644,root,root,755)
 %doc doc/stonith/README*
 %attr(755,root,root) %{_sbindir}/stonith
 %{_mandir}/man8/stonith.8*

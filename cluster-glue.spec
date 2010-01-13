@@ -6,6 +6,7 @@
 #   gmake[4]: *** [ipmilantest] Error 1
 #   gmake[4]: Leaving directory `/home/users/glen/rpm/BUILD.x86_64-linux/cluster-glue-1.0.2-rc2/lib/plugins/stonith'
 # - pld deps for "docbook-dtds"
+# - tests packaged in -devel to own pkg or just rm -rf
 %define		subver	rc2
 %define		rel		0.1
 Summary:	Reusable cluster components
@@ -103,8 +104,6 @@ rm -rf $RPM_BUILD_ROOT
 find $RPM_BUILD_ROOT -name '*.a' -exec rm {} \;
 find $RPM_BUILD_ROOT -name '*.la' -exec rm {} \;
 
-#%{_docdir}/cluster-glue-1.0.2/stonith/README.bladehpi
-
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -122,32 +121,37 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_sbindir}/meatclient
 %attr(755,root,root) %{_sbindir}/stonith
 %attr(755,root,root) %{_sbindir}/sbd
-%{_mandir}/man1/*
-%{_mandir}/man8/*
+%{_mandir}/man1/ha_logger.1*
+%{_mandir}/man8/ha_logd.8*
+%{_mandir}/man8/hb_report.8*
+%{_mandir}/man8/meatclient.8*
+%{_mandir}/man8/stonith.8*
 
 %dir %{_datadir}/%{name}
-%{_datadir}/%{name}/ha_cf_support.sh
-%{_datadir}/%{name}/openais_conf_support.sh
-%{_datadir}/%{name}/utillib.sh
-%{_datadir}/%{name}/combine-logs.pl
-%{_datadir}/%{name}/ha_log.sh
+%attr(755,root,root) %{_datadir}/%{name}/ha_cf_support.sh
+%attr(755,root,root) %{_datadir}/%{name}/openais_conf_support.sh
+%attr(755,root,root) %{_datadir}/%{name}/utillib.sh
+%attr(755,root,root) %{_datadir}/%{name}/combine-logs.pl
+%attr(755,root,root) %{_datadir}/%{name}/ha_log.sh
 
 %dir %{_libdir}/heartbeat
 %dir %{_libdir}/heartbeat/plugins
 %dir %{_libdir}/heartbeat/plugins/RAExec
 %dir %{_libdir}/heartbeat/plugins/InterfaceMgr
-%{_libdir}/heartbeat/lrmd
-%{_libdir}/heartbeat/ha_logd
-%{_libdir}/heartbeat/plugins/RAExec/*.so
-%{_libdir}/heartbeat/plugins/InterfaceMgr/*.so
+%attr(755,root,root) %{_libdir}/heartbeat/lrmd
+%attr(755,root,root) %{_libdir}/heartbeat/ha_logd
+%attr(755,root,root) %{_libdir}/heartbeat/plugins/InterfaceMgr/generic.so
+%attr(755,root,root) %{_libdir}/heartbeat/plugins/RAExec/heartbeat.so
+%attr(755,root,root) %{_libdir}/heartbeat/plugins/RAExec/lsb.so
+%attr(755,root,root) %{_libdir}/heartbeat/plugins/RAExec/ocf.so
 
 %dir %{_libdir}/stonith
 %dir %{_libdir}/stonith/plugins
 %dir %{_libdir}/stonith/plugins/stonith2
 %{_libdir}/stonith/plugins/external
-%{_libdir}/stonith/plugins/stonith2/*.so
-%{_libdir}/stonith/plugins/stonith2/*.py*
-%{_libdir}/stonith/plugins/xen0-ha-dom0-stonith-helper
+%attr(755,root,root) %{_libdir}/stonith/plugins/stonith2/*.so
+%attr(755,root,root) %{_libdir}/stonith/plugins/stonith2/ribcl.py
+%attr(755,root,root) %{_libdir}/stonith/plugins/xen0-ha-dom0-stonith-helper
 
 %dir %{_var}/lib/heartbeat
 %dir %{_var}/lib/heartbeat/cores
@@ -157,27 +161,60 @@ rm -rf $RPM_BUILD_ROOT
 
 %files libs
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/lib*.so.*
+%attr(755,root,root) %{_libdir}/liblrm.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/liblrm.so.2
+%attr(755,root,root) %{_libdir}/libpils.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libpils.so.2
+%attr(755,root,root) %{_libdir}/libplumb.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libplumb.so.2
+%attr(755,root,root) %{_libdir}/libplumbgpl.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libplumbgpl.so.2
+%attr(755,root,root) %{_libdir}/libstonith.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libstonith.so.1
 
 %files libs-devel
 %defattr(644,root,root,755)
+%attr(755,root,root) %{_libdir}/liblrm.so
+%attr(755,root,root) %{_libdir}/libpils.so
+%attr(755,root,root) %{_libdir}/libplumb.so
+%attr(755,root,root) %{_libdir}/libplumbgpl.so
+%attr(755,root,root) %{_libdir}/libstonith.so
 %{_includedir}/clplumbing
 %{_includedir}/heartbeat
 %{_includedir}/stonith
 %{_includedir}/pils
 
-%{_libdir}/lib*.so
-
 %dir %{_libdir}/heartbeat
 %dir %{_libdir}/heartbeat/plugins
+%attr(755,root,root) %{_libdir}/heartbeat/ipctest
+%attr(755,root,root) %{_libdir}/heartbeat/ipctransientclient
+%attr(755,root,root) %{_libdir}/heartbeat/ipctransientserver
+%attr(755,root,root) %{_libdir}/heartbeat/transient-test.sh
+%attr(755,root,root) %{_libdir}/heartbeat/base64_md5_test
+%attr(755,root,root) %{_libdir}/heartbeat/logtest
+
 %dir %{_libdir}/heartbeat/plugins/test
-%{_libdir}/heartbeat/ipctest
-%{_libdir}/heartbeat/ipctransientclient
-%{_libdir}/heartbeat/ipctransientserver
-%{_libdir}/heartbeat/transient-test.sh
-%{_libdir}/heartbeat/base64_md5_test
-%{_libdir}/heartbeat/logtest
-%{_libdir}/heartbeat/plugins/test/test.so
+%attr(755,root,root) %{_libdir}/heartbeat/plugins/test/test.so
 
 %dir %{_datadir}/%{name}
-%{_datadir}/%{name}/lrmtest
+%dir %{_datadir}/%{name}/lrmtest
+%{_datadir}/%{name}/lrmtest/README.regression
+%{_datadir}/%{name}/lrmtest/defaults
+%{_datadir}/%{name}/lrmtest/descriptions
+%{_datadir}/%{name}/lrmtest/language
+%{_datadir}/%{name}/lrmtest/lrmadmin-interface
+%attr(755,root,root) %{_datadir}/%{name}/lrmtest/LRMBasicSanityCheck
+%attr(755,root,root) %{_datadir}/%{name}/lrmtest/lrmregtest*
+%attr(755,root,root) %{_datadir}/%{name}/lrmtest/*.sh
+
+%dir %{_datadir}/%{name}/lrmtest/testcases
+%{_datadir}/%{name}/lrmtest/testcases/BSC
+%{_datadir}/%{name}/lrmtest/testcases/basicset
+%{_datadir}/%{name}/lrmtest/testcases/metadata
+%{_datadir}/%{name}/lrmtest/testcases/metadata.exp
+%{_datadir}/%{name}/lrmtest/testcases/rscexec
+%{_datadir}/%{name}/lrmtest/testcases/rscexec.exp
+%{_datadir}/%{name}/lrmtest/testcases/rscmgmt
+%{_datadir}/%{name}/lrmtest/testcases/rscmgmt.exp
+%attr(755,root,root) %{_datadir}/%{name}/lrmtest/testcases/*filter
+%attr(755,root,root) %{_datadir}/%{name}/lrmtest/testcases/*.sh

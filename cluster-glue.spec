@@ -8,17 +8,15 @@
 # - tests packaged in -devel to own pkg or just rm -rf
 # - pldize ha_logd initscript (look heartbeat.init?)
 # - stonith-libs? pils?
-%define		subver	rc2
-%define		rel		0.3
 Summary:	Reusable cluster components
 Name:		cluster-glue
-Version:	1.0.2
-Release:	0.%{subver}.%{rel}
+Version:	1.0.5
+Release:	0.1
 License:	GPL v2+ and LGPL v2+
 Group:		Base
-URL:		http://www.clusterlabs.org/
-Source0:	http://www.linux-ha.org/w/images/3/3d/Cluster-glue-%{version}-%{subver}.tar.bz2
-# Source0-md5:	1f83b6bd83d9cae5310c32d14fecf2fd
+URL:		http://www.linux-ha.org/
+Source0:	http://hg.linux-ha.org/glue/archive/glue-%{version}.tar.bz2
+# Source0-md5:	09721e2d2ab3c3fa6696b4347e31721a
 Patch0:		heartbeat-no_ipmilan_test.patch
 BuildRequires:	OpenIPMI-devel
 BuildRequires:	autoconf
@@ -104,7 +102,7 @@ STONITH (Shoot The Other Node In The Head) to interfejs służący do
 "odstrzelenia" drugiego węzła w klastrze.
 
 %prep
-%setup -q -n %{name}-%{version}-%{subver}
+%setup -q -n Reusable-Cluster-Components-glue-%{version}
 %patch0 -p1
 
 %build
@@ -115,7 +113,7 @@ STONITH (Shoot The Other Node In The Head) to interfejs służący do
 %{__autoconf}
 %configure \
 	--with-initdir=/etc/rc.d/init.d \
-	--enable-fatal-warnings=yes \
+	--disable-fatal-warnings \
 	--with-daemon-group=haclient \
 	--with-daemon-user=hacluster\
 	--docdir=%{_docdir}/%{name}-%{version} \

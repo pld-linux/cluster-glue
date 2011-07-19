@@ -1,23 +1,16 @@
 # TODO
-# - filterout fix needed:
-#   ./.libs/ipmilan.so: undefined reference to `stonith_free_hostlist'
-#   ./.libs/ipmilan.so: undefined reference to `PILCallLog'
-#   collect2: ld returned 1 exit status
-#   gmake[4]: *** [ipmilantest] Error 1
-#   gmake[4]: Leaving directory `/home/users/glen/rpm/BUILD.x86_64-linux/cluster-glue-1.0.2-rc2/lib/plugins/stonith'
 # - tests packaged in -devel to own pkg or just rm -rf
 # - pldize ha_logd initscript (look heartbeat.init?)
 # - stonith-libs? pils?
 Summary:	Reusable cluster components
 Name:		cluster-glue
 Version:	1.0.7
-Release:	0.1
+Release:	0.2
 License:	GPL v2+ and LGPL v2+
 Group:		Base
 URL:		http://www.linux-ha.org/
 Source0:	http://hg.linux-ha.org/glue/archive/glue-%{version}.tar.bz2
 # Source0-md5:	aafd04ae7035f11664f1967a513d75a2
-Patch0:		heartbeat-no_ipmilan_test.patch
 BuildRequires:	OpenIPMI-devel
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -102,8 +95,7 @@ STONITH (Shoot The Other Node In The Head) to interfejs służący do
 "odstrzelenia" drugiego węzła w klastrze.
 
 %prep
-%setup -q -n Reusable-Cluster-Components-glue-%{version}
-%patch0 -p1
+%setup -q -n Reusable-Cluster-Components-glue--glue-%{version}
 
 %build
 %{__libtoolize}

@@ -10,13 +10,13 @@
 # - stonith-libs? pils?
 Summary:	Reusable cluster components
 Name:		cluster-glue
-Version:	1.0.5
+Version:	1.0.7
 Release:	0.1
 License:	GPL v2+ and LGPL v2+
 Group:		Base
 URL:		http://www.linux-ha.org/
 Source0:	http://hg.linux-ha.org/glue/archive/glue-%{version}.tar.bz2
-# Source0-md5:	09721e2d2ab3c3fa6696b4347e31721a
+# Source0-md5:	aafd04ae7035f11664f1967a513d75a2
 Patch0:		heartbeat-no_ipmilan_test.patch
 BuildRequires:	OpenIPMI-devel
 BuildRequires:	autoconf

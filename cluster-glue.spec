@@ -4,13 +4,13 @@
 # - stonith-libs? pils?
 Summary:	Reusable cluster components
 Name:		cluster-glue
-Version:	1.0.7
+Version:	1.0.8
 Release:	1
 License:	GPL v2+ and LGPL v2+
 Group:		Base
 URL:		http://www.linux-ha.org/
 Source0:	http://hg.linux-ha.org/glue/archive/glue-%{version}.tar.bz2
-# Source0-md5:	aafd04ae7035f11664f1967a513d75a2
+# Source0-md5:	6cbeaed8b108cfac9ae693e8ab333283
 BuildRequires:	OpenIPMI-devel
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -155,6 +155,7 @@ fi
 %attr(755,root,root) %{_sbindir}/lrmadmin
 %attr(755,root,root) %{_sbindir}/meatclient
 %attr(755,root,root) %{_sbindir}/sbd
+%attr(755,root,root) %{_sbindir}/cibsecret
 %{_mandir}/man1/ha_logger.1*
 %{_mandir}/man8/ha_logd.8*
 %{_mandir}/man8/hb_report.8*

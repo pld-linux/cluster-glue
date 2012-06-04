@@ -5,12 +5,13 @@
 Summary:	Reusable cluster components
 Name:		cluster-glue
 Version:	1.0.9
-Release:	1
+Release:	2
 License:	GPL v2+ and LGPL v2+
 Group:		Base
 URL:		http://www.linux-ha.org/
 Source0:	http://hg.linux-ha.org/glue/archive/glue-%{version}.tar.bz2
 # Source0-md5:	da2cbe949b0614cc3ce910f3caa34603
+Patch0:		%{name}-glib_includes.patch
 BuildRequires:	OpenIPMI-devel
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -96,6 +97,8 @@ STONITH (Shoot The Other Node In The Head) to interfejs służący do
 
 %prep
 %setup -q -n Reusable-Cluster-Components-glue--glue-%{version}
+
+%patch0 -p1
 
 %build
 %{__libtoolize}
@@ -244,6 +247,8 @@ fi
 %{_datadir}/%{name}/lrmtest/testcases/rscexec.exp
 %{_datadir}/%{name}/lrmtest/testcases/rscmgmt
 %{_datadir}/%{name}/lrmtest/testcases/rscmgmt.exp
+%{_datadir}/%{name}/lrmtest/testcases/stonith
+%{_datadir}/%{name}/lrmtest/testcases/stonith.exp
 %attr(755,root,root) %{_datadir}/%{name}/lrmtest/testcases/*filter
 %attr(755,root,root) %{_datadir}/%{name}/lrmtest/testcases/*.sh
 

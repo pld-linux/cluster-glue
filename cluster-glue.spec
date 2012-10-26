@@ -172,8 +172,6 @@ fi
 %attr(755,root,root) %{_datadir}/%{name}/combine-logs.pl
 %attr(755,root,root) %{_datadir}/%{name}/ha_log.sh
 
-%dir %{_libdir}/heartbeat
-%dir %{_libdir}/heartbeat/plugins
 %dir %{_libdir}/heartbeat/plugins/RAExec
 %dir %{_libdir}/heartbeat/plugins/InterfaceMgr
 %attr(755,root,root) %{_libdir}/heartbeat/lrmd
@@ -202,6 +200,9 @@ fi
 %attr(755,root,root) %ghost %{_libdir}/libplumbgpl.so.2
 %attr(755,root,root) %{_libdir}/libstonith.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libstonith.so.1
+%dir %{_libdir}/heartbeat
+%dir %{_libdir}/heartbeat/plugins
+%dir %{_includedir}/heartbeat
 
 %files libs-devel
 %defattr(644,root,root,755)
@@ -211,12 +212,10 @@ fi
 %attr(755,root,root) %{_libdir}/libplumbgpl.so
 %attr(755,root,root) %{_libdir}/libstonith.so
 %{_includedir}/clplumbing
-%{_includedir}/heartbeat
+%{_includedir}/heartbeat/*
 %{_includedir}/stonith
 %{_includedir}/pils
 
-%dir %{_libdir}/heartbeat
-%dir %{_libdir}/heartbeat/plugins
 %attr(755,root,root) %{_libdir}/heartbeat/ipctest
 %attr(755,root,root) %{_libdir}/heartbeat/ipctransientclient
 %attr(755,root,root) %{_libdir}/heartbeat/ipctransientserver

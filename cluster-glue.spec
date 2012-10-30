@@ -11,6 +11,7 @@ Group:		Base
 URL:		http://www.linux-ha.org/
 Source0:	http://hg.linux-ha.org/glue/archive/glue-%{version}.tar.bz2
 # Source0-md5:	7d0acd99d43edac849dc76f43cfa4c7f
+Source1:	logd.service
 BuildRequires:	OpenIPMI-devel
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -43,6 +44,8 @@ Requires(pre):	/bin/id
 Requires(pre):	/usr/bin/getgid
 Requires(pre):	/usr/sbin/groupadd
 Requires(pre):	/usr/sbin/useradd
+Requires(post,preun,postun):	systemd-units
+Requires:	systemd-units
 Requires:	%{name}-libs = %{version}-%{release}
 Requires:	perl-TimeDate
 Requires:	rc-scripts
@@ -116,11 +119,15 @@ STONITH (Shoot The Other Node In The Head) to interfejs służący do
 
 %install
 rm -rf $RPM_BUILD_ROOT
+install -d $RPM_BUILD_ROOT%{systemdunitdir}
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
 
 find $RPM_BUILD_ROOT -name '*.la' -delete
+
+%{__sed} -e's;@libdir@;%{_libdir};g' \
+	%{SOURCE1} > $RPM_BUILD_ROOT%{systemdunitdir}/logd.service
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -132,18 +139,21 @@ rm -rf $RPM_BUILD_ROOT
 %post
 /sbin/chkconfig --add logd
 %service logd restart
+%systemd_post logd.service
 
 %preun
 if [ "$1" = "0" ]; then
 	%service -q logd stop
 	/sbin/chkconfig --del logd
 fi
+%systemd_preun logd.service
 
 %postun
 if [ "$1" = "0" ]; then
 	%userremove hacluster
 	%groupremove haclient
 fi
+%systemd_reload
 
 %post	libs -p /sbin/ldconfig
 %postun	libs -p /sbin/ldconfig
@@ -152,6 +162,7 @@ fi
 %defattr(644,root,root,755)
 %doc AUTHORS logd/logd.cf
 %attr(754,root,root) /etc/rc.d/init.d/logd
+%{systemdunitdir}/logd.service
 
 %attr(755,root,root) %{_sbindir}/ha_logger
 %attr(755,root,root) %{_sbindir}/hb_report

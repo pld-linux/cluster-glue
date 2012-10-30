@@ -4,14 +4,13 @@
 # - stonith-libs? pils?
 Summary:	Reusable cluster components
 Name:		cluster-glue
-Version:	1.0.9
-Release:	4
+Version:	1.0.11
+Release:	1
 License:	GPL v2+ and LGPL v2+
 Group:		Base
 URL:		http://www.linux-ha.org/
 Source0:	http://hg.linux-ha.org/glue/archive/glue-%{version}.tar.bz2
-# Source0-md5:	da2cbe949b0614cc3ce910f3caa34603
-Patch0:		%{name}-glib_includes.patch
+# Source0-md5:	7d0acd99d43edac849dc76f43cfa4c7f
 BuildRequires:	OpenIPMI-devel
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -21,6 +20,7 @@ BuildRequires:	docbook-dtd42-xml
 BuildRequires:	docbook-dtd44-xml
 BuildRequires:	docbook-style-xsl
 BuildRequires:	glib2-devel
+BuildRequires:	libaio-devel
 BuildRequires:	libltdl-devel
 BuildRequires:	libnet-devel
 BuildRequires:	libstdc++-devel
@@ -35,6 +35,7 @@ BuildRequires:	openssl-devel
 BuildRequires:	pkgconfig
 BuildRequires:	python-devel
 BuildRequires:	rpm-pythonprov
+BuildRequires:	zlib-devel
 Requires(post,preun):	/sbin/chkconfig
 Requires(postun):	/usr/sbin/groupdel
 Requires(postun):	/usr/sbin/userdel
@@ -98,8 +99,6 @@ STONITH (Shoot The Other Node In The Head) to interfejs służący do
 %prep
 %setup -q -n Reusable-Cluster-Components-glue--glue-%{version}
 
-%patch0 -p1
-
 %build
 %{__libtoolize}
 %{__aclocal}
@@ -117,6 +116,7 @@ STONITH (Shoot The Other Node In The Head) to interfejs służący do
 
 %install
 rm -rf $RPM_BUILD_ROOT
+
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
 
@@ -174,12 +174,15 @@ fi
 
 %dir %{_libdir}/heartbeat/plugins/RAExec
 %dir %{_libdir}/heartbeat/plugins/InterfaceMgr
+%dir %{_libdir}/heartbeat/plugins/compress
 %attr(755,root,root) %{_libdir}/heartbeat/lrmd
 %attr(755,root,root) %{_libdir}/heartbeat/ha_logd
 %attr(755,root,root) %{_libdir}/heartbeat/plugins/InterfaceMgr/generic.so
 %attr(755,root,root) %{_libdir}/heartbeat/plugins/RAExec/heartbeat.so
 %attr(755,root,root) %{_libdir}/heartbeat/plugins/RAExec/lsb.so
 %attr(755,root,root) %{_libdir}/heartbeat/plugins/RAExec/ocf.so
+%attr(755,root,root) %{_libdir}/heartbeat/plugins/compress/bz2.so
+%attr(755,root,root) %{_libdir}/heartbeat/plugins/compress/zlib.so
 
 %dir /var/lib/heartbeat
 %attr(711,root,root) %dir /var/lib/heartbeat/cores

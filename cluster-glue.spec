@@ -101,6 +101,8 @@ STONITH (Shoot The Other Node In The Head) to interfejs służący do
 
 %prep
 %setup -q -n Reusable-Cluster-Components-glue--glue-%{version}
+sed -i -e's;#!/usr/bin/env \(python\|perl\);#!/usr/bin/\1;' \
+					lib/plugins/stonith/external/*
 
 %build
 %{__libtoolize}

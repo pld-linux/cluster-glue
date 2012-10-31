@@ -5,7 +5,7 @@
 Summary:	Reusable cluster components
 Name:		cluster-glue
 Version:	1.0.11
-Release:	1
+Release:	2
 License:	GPL v2+ and LGPL v2+
 Group:		Base
 URL:		http://www.linux-ha.org/
@@ -272,8 +272,9 @@ fi
 %{_mandir}/man8/stonith.8*
 %dir %{_libdir}/stonith
 %dir %{_libdir}/stonith/plugins
+%dir %{_libdir}/stonith/plugins/external
+%attr(755,root,root) %{_libdir}/stonith/plugins/external
 %dir %{_libdir}/stonith/plugins/stonith2
-%{_libdir}/stonith/plugins/external
 %attr(755,root,root) %{_libdir}/stonith/plugins/stonith2/*.so
 %attr(755,root,root) %{_libdir}/stonith/plugins/stonith2/ribcl.py
 %attr(755,root,root) %{_libdir}/stonith/plugins/xen0-ha-dom0-stonith-helper

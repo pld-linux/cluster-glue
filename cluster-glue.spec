@@ -275,7 +275,7 @@ fi
 %dir %{_libdir}/stonith
 %dir %{_libdir}/stonith/plugins
 %dir %{_libdir}/stonith/plugins/external
-%attr(755,root,root) %{_libdir}/stonith/plugins/external
+%attr(755,root,root) %{_libdir}/stonith/plugins/external/*
 %dir %{_libdir}/stonith/plugins/stonith2
 %attr(755,root,root) %{_libdir}/stonith/plugins/stonith2/*.so
 %attr(755,root,root) %{_libdir}/stonith/plugins/stonith2/ribcl.py

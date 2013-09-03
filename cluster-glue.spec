@@ -3,15 +3,16 @@
 # - pldize ha_logd initscript (look heartbeat.init?)
 # - stonith-libs? pils?
 Summary:	Reusable cluster components
+Summary(pl.UTF-8):	Komponenty klastrowe wielokrotnego użytku
 Name:		cluster-glue
 Version:	1.0.11
 Release:	5
 License:	GPL v2+ and LGPL v2+
 Group:		Base
-URL:		http://www.linux-ha.org/
 Source0:	http://hg.linux-ha.org/glue/archive/glue-%{version}.tar.bz2
 # Source0-md5:	7d0acd99d43edac849dc76f43cfa4c7f
 Source1:	logd.service
+URL:		http://www.linux-ha.org/
 BuildRequires:	OpenIPMI-devel
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -65,8 +66,15 @@ managers such as Pacemaker. Provides a local resource manager that
 understands the OCF and LSB standards, and an interface to common
 STONITH devices.
 
+%description -l pl.UTF-8
+Zbiór wspólnych narzędzi przydatnych przy pisaniu zarządców klastrów,
+takich jak Pacemaker. Pakiet zawiera zarządcę zasobów lokalnych
+zgodnego ze standardami OCF i LSB oraz interfejs do wspólnych urządzeń
+STONITH.
+
 %package libs
 Summary:	Reusable cluster libraries
+Summary(pl.UTF-8):	Biblioteki klastrowe wielokrotnego użytku
 Group:		Development/Libraries
 Obsoletes:	libheartbeat2
 
@@ -74,15 +82,23 @@ Obsoletes:	libheartbeat2
 A collection of libraries that are useful for writing cluster managers
 such as Pacemaker.
 
+%description libs -l pl.UTF-8
+Zbiór bibliotek przydatnych przy pisaniu zarządców klastrów, takich
+jak Pacemaker.
+
 %package libs-devel
-Summary:	Headers and libraries for writing cluster managers
+Summary:	Header files for writing cluster managers
+Summary(pl.UTF-8):	Pliki nagłówkowe do pisania zarządców klastrów
 Group:		Development/Libraries
 Requires:	%{name}-libs = %{version}-%{release}
 Obsoletes:	libheartbeat-devel
 
 %description libs-devel
-Headers and shared libraries for a useful for writing cluster managers
-such as Pacemaker.
+Header files useful for writing cluster managers such as Pacemaker.
+
+%description libs-devel -l pl.UTF-8
+Pliki nagłówkowe przydatne przy pisaniu zarządców klastrów, takich jak
+Pacemaker.
 
 %package stonith
 Summary:	Provides an interface to Shoot The Other Node In The Head

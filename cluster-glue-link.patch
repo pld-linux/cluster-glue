@@ -1,0 +1,104 @@
+--- Reusable-Cluster-Components-glue--glue-1.0.11/lib/plugins/stonith/Makefile.am.orig	2012-10-15 15:58:55.000000000 +0200
++++ Reusable-Cluster-Components-glue--glue-1.0.11/lib/plugins/stonith/Makefile.am	2013-09-06 15:41:19.579970814 +0200
+@@ -156,7 +156,7 @@
+ 
+ rhcs_la_SOURCES	= rhcs.c	$(INCFILES)
+ rhcs_la_LDFLAGS	= -export-dynamic -module -avoid-version
+-rhcs_la_LIBADD	= $(top_builddir)/lib/stonith/libstonith.la $(top_builddir)/replace/libreplace.la
++rhcs_la_LIBADD	= $(top_builddir)/lib/stonith/libstonith.la $(top_builddir)/replace/libreplace.la $(LIBXML2)
+ 
+ ibmhmc_la_SOURCES	= ibmhmc.c	$(INCFILES)
+ ibmhmc_la_LDFLAGS	= -export-dynamic -module -avoid-version
+@@ -196,7 +196,7 @@
+ 
+ vacm_la_SOURCES		= vacm.c $(INCFILES)
+ vacm_la_LDFLAGS		= -export-dynamic -module -avoid-version
+-vacm_la_LIBADD		= $(top_builddir)/lib/stonith/libstonith.la $(top_builddir)/replace/libreplace.la
++vacm_la_LIBADD		= $(top_builddir)/lib/stonith/libstonith.la $(top_builddir)/replace/libreplace.la -lvacmclient
+ 
+ wti_nps_la_SOURCES	= wti_nps.c $(INCFILES)
+ wti_nps_la_LDFLAGS	= -export-dynamic -module -avoid-version
+--- Reusable-Cluster-Components-glue--glue-1.0.11/configure.ac.orig	2013-09-06 16:40:51.983154227 +0200
++++ Reusable-Cluster-Components-glue--glue-1.0.11/configure.ac	2013-09-06 17:26:50.276371805 +0200
+@@ -545,14 +545,13 @@
+ dnl ===============================================
+ dnl Libraries
+ dnl ===============================================
+-AC_CHECK_LIB(socket, socket)			
+-AC_CHECK_LIB(c, dlopen)				dnl if dlopen is in libc...
+-AC_CHECK_LIB(dl, dlopen)			dnl for Linux
+-AC_CHECK_LIB(rt, sched_getscheduler)            dnl for Tru64
+-AC_CHECK_LIB(gnugetopt, getopt_long)		dnl if available
+-AC_CHECK_LIB(uuid, uuid_parse)			dnl e2fsprogs
+-AC_CHECK_LIB(uuid, uuid_create)			dnl ossp
+-AC_CHECK_LIB(posix4, sched_getscheduler)
++AC_SEARCH_LIBS(socket, [socket])
++AC_SEARCH_LIBS(dlopen, [dl])
++AC_SEARCH_LIBS(sched_getscheduler, [rt posix4])
++AC_SEARCH_LIBS(getopt_long, [gnugetopt])		dnl if available
++AC_CHECK_LIB(uuid, uuid_parse, [LIBUUID=-luuid])	dnl e2fsprogs
++AC_CHECK_LIB(uuid, uuid_create, [LIBUUID=-luuid])	dnl ossp
++AC_SUBST([LIBUUID])
+ 
+ if test x"${PKGCONFIG}" = x""; then
+    AC_MSG_ERROR(You need pkgconfig installed in order to build ${PACKAGE})
+@@ -699,7 +697,8 @@
+ else
+    XML2HEAD="`$XML2CONFIG --cflags`"
+    AC_MSG_RESULT($XML2HEAD)
+-   AC_CHECK_LIB(xml2, xmlReadMemory)
++   AC_CHECK_LIB(xml2, xmlReadMemory, [LIBXML2=-lxml2])
++   AC_SUBST([LIBXML2])
+ fi
+ 
+ CPPFLAGS="$CPPFLAGS $XML2HEAD"
+@@ -1107,7 +1105,7 @@
+ dnl check if header file and lib are there for zlib
+ zlib_installed="yes"
+ AC_CHECK_HEADERS(zlib.h, , [zlib_installed="no"],)
+-AC_CHECK_LIB(z, compress , , [zlib_installed="no"])
++AC_CHECK_LIB(z, compress , [LIBZ=-lz], [zlib_installed="no"])
+ AM_CONDITIONAL(BUILD_ZLIB_COMPRESS_MODULE, test "x${zlib_installed}" = "xyes")
+ if test "x${zlib_installed}" = "xno"; then
+ 	FatalMissingThing "zlib" \
+@@ -1116,7 +1114,7 @@
+ 
+ bz2_installed="yes"
+ AC_CHECK_HEADERS(bzlib.h, , [bz2_installed="no"],)
+-AC_CHECK_LIB(bz2, BZ2_bzBuffToBuffCompress , , [bz2_installed="no"])
++AC_CHECK_LIB(bz2, BZ2_bzBuffToBuffCompress , [LIBBZ2=-lbz2], [bz2_installed="no"])
+ AM_CONDITIONAL(BUILD_BZ2_COMPRESS_MODULE, test "x${bz2_installed}" = "xyes")
+ 
+ #if test x$ac_cv_lib_bz2_BZ2_bzBuffToBuffCompress != xyes ; then
+--- Reusable-Cluster-Components-glue--glue-1.0.11/lib/clplumbing/Makefile.am.orig	2012-10-15 15:58:55.000000000 +0200
++++ Reusable-Cluster-Components-glue--glue-1.0.11/lib/clplumbing/Makefile.am	2013-09-06 17:39:45.736339262 +0200
+@@ -61,7 +61,7 @@
+ 			uids.c 	
+ 
+ libplumb_la_LIBADD      = $(top_builddir)/replace/libreplace.la \
+-			$(top_builddir)/lib/pils/libpils.la
++			$(top_builddir)/lib/pils/libpils.la $(LIBUUID)
+ libplumb_la_LDFLAGS	= -version-info 3:0:1
+ 
+ libplumbgpl_la_SOURCES	= setproctitle.c
+--- Reusable-Cluster-Components-glue--glue-1.0.11/lib/stonith/Makefile.am.orig	2012-10-15 15:58:55.000000000 +0200
++++ Reusable-Cluster-Components-glue--glue-1.0.11/lib/stonith/Makefile.am	2013-09-06 17:49:16.516315308 +0200
+@@ -33,7 +33,7 @@
+ 
+ stonith_SOURCES		= main.c
+ 
+-stonith_LDADD		= libstonith.la $(top_builddir)/lib/pils/libpils.la $(GLIBLIB) \
++stonith_LDADD		= libstonith.la $(top_builddir)/lib/pils/libpils.la $(GLIBLIB) $(LIBXML2) \
+ 			$(top_builddir)/lib/clplumbing/libplumb.la	\
+ 			$(top_builddir)/lib/clplumbing/libplumbgpl.la
+ stonith_LDFLAGS		=  @LIBADD_DL@ @LIBLTDL@ -export-dynamic @DLOPEN_FORCE_FLAGS@ @LIBADD_INTL@ 
+--- Reusable-Cluster-Components-glue--glue-1.0.11/lib/plugins/lrm/Makefile.am.orig	2012-10-15 15:58:55.000000000 +0200
++++ Reusable-Cluster-Components-glue--glue-1.0.11/lib/plugins/lrm/Makefile.am	2013-09-06 17:59:43.946288978 +0200
+@@ -44,6 +44,7 @@
+ 
+ lsb_la_SOURCES = raexeclsb.c
+ lsb_la_LDFLAGS = -L$(top_builddir)/lib/pils -lpils -export-dynamic -module -avoid-version
++lsb_la_LIBADD = $(LIBXML2)
+ 
+ ocf_la_SOURCES = raexecocf.c
+ ocf_la_LDFLAGS = -L$(top_builddir)/lib/pils -lpils -export-dynamic -module -avoid-version

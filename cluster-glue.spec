@@ -1,42 +1,51 @@
-# TODO
-# - tests packaged in -devel to own pkg or just rm -rf
+# TODO:
 # - pldize ha_logd initscript (look heartbeat.init?)
-# - stonith-libs? pils?
+# - stonith-libs? pils? (any sense? libs are small and have little external dependencies)
+# - separate some stonith plugins which have external dependencies?
+#
+# Conditional build:
+%bcond_without	vacm	# VACM stonith plugin
+#
 Summary:	Reusable cluster components
 Summary(pl.UTF-8):	Komponenty klastrowe wielokrotnego użytku
 Name:		cluster-glue
 Version:	1.0.11
 Release:	5
 License:	GPL v2+ and LGPL v2+
-Group:		Base
+Group:		Aplications/System
 Source0:	http://hg.linux-ha.org/glue/archive/glue-%{version}.tar.bz2
 # Source0-md5:	7d0acd99d43edac849dc76f43cfa4c7f
 Source1:	logd.service
+Patch0:		%{name}-link.patch
+Patch1:		%{name}-opt.patch
 URL:		http://www.linux-ha.org/
-BuildRequires:	OpenIPMI-devel
-BuildRequires:	autoconf
+BuildRequires:	OpenIPMI-devel >= 1.4
+BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake
 BuildRequires:	bzip2-devel
 BuildRequires:	curl-devel
 BuildRequires:	docbook-dtd42-xml
 BuildRequires:	docbook-dtd44-xml
 BuildRequires:	docbook-style-xsl
-BuildRequires:	glib2-devel
+BuildRequires:	glib2-devel >= 2.0
+BuildRequires:	help2man
 BuildRequires:	libaio-devel
 BuildRequires:	libltdl-devel
-BuildRequires:	libnet-devel
+BuildRequires:	libnet-devel >= 1.0
 BuildRequires:	libstdc++-devel
 BuildRequires:	libtool
 BuildRequires:	libuuid-devel
-BuildRequires:	libxml2-devel
+BuildRequires:	libxml2-devel >= 2.0
 BuildRequires:	libxslt-progs
 BuildRequires:	ncurses-devel
 BuildRequires:	net-snmp-devel >= 5.4
 BuildRequires:	openhpi-devel
 BuildRequires:	openssl-devel
+BuildRequires:	perl-tools-pod
 BuildRequires:	pkgconfig
 BuildRequires:	python-devel
 BuildRequires:	rpm-pythonprov
+%{?with_vacm:BuildRequires:	vacm-devel}
 BuildRequires:	zlib-devel
 Requires(post,preun):	/sbin/chkconfig
 Requires(postun):	/usr/sbin/groupdel
@@ -58,8 +67,6 @@ Obsoletes:	heartbeat-common
 Obsoletes:	heartbeat-pils < 3.0.0-1
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-%define		filterout_ld	-Wl,--as-needed
-
 %description
 A collection of common tools that are useful for writing cluster
 managers such as Pacemaker. Provides a local resource manager that
@@ -75,7 +82,7 @@ STONITH.
 %package libs
 Summary:	Reusable cluster libraries
 Summary(pl.UTF-8):	Biblioteki klastrowe wielokrotnego użytku
-Group:		Development/Libraries
+Group:		Libraries
 Obsoletes:	libheartbeat2
 
 %description libs
@@ -91,6 +98,8 @@ Summary:	Header files for writing cluster managers
 Summary(pl.UTF-8):	Pliki nagłówkowe do pisania zarządców klastrów
 Group:		Development/Libraries
 Requires:	%{name}-libs = %{version}-%{release}
+Requires:	glib2-devel >= 2.0
+Requires:	libltdl-devel
 Obsoletes:	libheartbeat-devel
 
 %description libs-devel
@@ -99,6 +108,18 @@ Header files useful for writing cluster managers such as Pacemaker.
 %description libs-devel -l pl.UTF-8
 Pliki nagłówkowe przydatne przy pisaniu zarządców klastrów, takich jak
 Pacemaker.
+
+%package tests
+Summary:	Tests for cluster-glue framework
+Summary(pl.UTF-8):	Testy dla szkieletu cluster-glue
+Group:		Development
+Requires:	%{name}-libs = %{version}-%{release}
+
+%description tests
+Tests for cluster-glue framework.
+
+%description tests -l pl.UTF-8
+Testy dla szkieletu cluster-glue.
 
 %package stonith
 Summary:	Provides an interface to Shoot The Other Node In The Head
@@ -117,6 +138,9 @@ STONITH (Shoot The Other Node In The Head) to interfejs służący do
 
 %prep
 %setup -q -n Reusable-Cluster-Components-glue--glue-%{version}
+%patch0 -p1
+%patch1 -p1
+
 sed -i -e's;#!/usr/bin/env \(python\|perl\);#!/usr/bin/\1;' \
 					lib/plugins/stonith/external/*
 
@@ -127,12 +151,12 @@ sed -i -e's;#!/usr/bin/env \(python\|perl\);#!/usr/bin/\1;' \
 %{__automake}
 %{__autoconf}
 %configure \
-	--with-initdir=/etc/rc.d/init.d \
-	--disable-fatal-warnings \
-	--with-daemon-group=haclient \
-	--with-daemon-user=hacluster\
 	--docdir=%{_docdir}/%{name}-%{version} \
-	--disable-static
+	--disable-fatal-warnings \
+	--disable-static \
+	--with-daemon-group=haclient \
+	--with-daemon-user=hacluster \
+	--with-initdir=/etc/rc.d/init.d
 %{__make}
 
 %install
@@ -144,7 +168,7 @@ install -d $RPM_BUILD_ROOT%{systemdunitdir}
 
 find $RPM_BUILD_ROOT -name '*.la' -delete
 
-%{__sed} -e's;@libdir@;%{_libdir};g' \
+%{__sed} -e 's;@libdir@;%{_libdir};g' \
 	%{SOURCE1} > $RPM_BUILD_ROOT%{systemdunitdir}/logd.service
 
 %clean
@@ -178,7 +202,7 @@ fi
 
 %files
 %defattr(644,root,root,755)
-%doc AUTHORS logd/logd.cf
+%doc AUTHORS ChangeLog logd/logd.cf
 %attr(754,root,root) /etc/rc.d/init.d/logd
 %{systemdunitdir}/logd.service
 
@@ -234,6 +258,7 @@ fi
 %attr(755,root,root) %ghost %{_libdir}/libstonith.so.1
 %dir %{_libdir}/heartbeat
 %dir %{_libdir}/heartbeat/plugins
+# also used by resource-agents runtime package (shouldn't agent_config.h be in resource-agents-devel?)
 %dir %{_includedir}/heartbeat
 
 %files libs-devel
@@ -244,10 +269,15 @@ fi
 %attr(755,root,root) %{_libdir}/libplumbgpl.so
 %attr(755,root,root) %{_libdir}/libstonith.so
 %{_includedir}/clplumbing
-%{_includedir}/heartbeat/*
+%{_includedir}/heartbeat/compress.h
+%{_includedir}/heartbeat/glue_config.h
+%{_includedir}/heartbeat/ha_msg.h
+%{_includedir}/heartbeat/lrm
 %{_includedir}/stonith
 %{_includedir}/pils
 
+%files tests
+%defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/heartbeat/ipctest
 %attr(755,root,root) %{_libdir}/heartbeat/ipctransientclient
 %attr(755,root,root) %{_libdir}/heartbeat/ipctransientserver
@@ -293,6 +323,33 @@ fi
 %dir %{_libdir}/stonith/plugins/external
 %attr(755,root,root) %{_libdir}/stonith/plugins/external/*
 %dir %{_libdir}/stonith/plugins/stonith2
-%attr(755,root,root) %{_libdir}/stonith/plugins/stonith2/*.so
+%attr(755,root,root) %{_libdir}/stonith/plugins/stonith2/apcmaster.so
+%attr(755,root,root) %{_libdir}/stonith/plugins/stonith2/apcmastersnmp.so
+%attr(755,root,root) %{_libdir}/stonith/plugins/stonith2/apcsmart.so
+%attr(755,root,root) %{_libdir}/stonith/plugins/stonith2/baytech.so
+# R: openhpi
+%attr(755,root,root) %{_libdir}/stonith/plugins/stonith2/bladehpi.so
+%attr(755,root,root) %{_libdir}/stonith/plugins/stonith2/cyclades.so
+# R: curl libxml2
+%attr(755,root,root) %{_libdir}/stonith/plugins/stonith2/drac3.so
+%attr(755,root,root) %{_libdir}/stonith/plugins/stonith2/external.so
+%attr(755,root,root) %{_libdir}/stonith/plugins/stonith2/ibmhmc.so
+# R: OpenIPMI
+%attr(755,root,root) %{_libdir}/stonith/plugins/stonith2/ipmilan.so
+%attr(755,root,root) %{_libdir}/stonith/plugins/stonith2/meatware.so
+%attr(755,root,root) %{_libdir}/stonith/plugins/stonith2/null.so
+%attr(755,root,root) %{_libdir}/stonith/plugins/stonith2/nw_rpc100s.so
+%attr(755,root,root) %{_libdir}/stonith/plugins/stonith2/rcd_serial.so
+# R: libxml2
+%attr(755,root,root) %{_libdir}/stonith/plugins/stonith2/rhcs.so
+%attr(755,root,root) %{_libdir}/stonith/plugins/stonith2/rps10.so
+%attr(755,root,root) %{_libdir}/stonith/plugins/stonith2/ssh.so
+%attr(755,root,root) %{_libdir}/stonith/plugins/stonith2/suicide.so
+%if %{with vacm}
+# R: vacm-libs
+%attr(755,root,root) %{_libdir}/stonith/plugins/stonith2/vacm.so
+%endif
+%attr(755,root,root) %{_libdir}/stonith/plugins/stonith2/wti_mpc.so
+%attr(755,root,root) %{_libdir}/stonith/plugins/stonith2/wti_nps.so
 %attr(755,root,root) %{_libdir}/stonith/plugins/stonith2/ribcl.py
 %attr(755,root,root) %{_libdir}/stonith/plugins/xen0-ha-dom0-stonith-helper

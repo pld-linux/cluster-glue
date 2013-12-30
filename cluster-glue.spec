@@ -10,7 +10,7 @@ Summary:	Reusable cluster components
 Summary(pl.UTF-8):	Komponenty klastrowe wielokrotnego użytku
 Name:		cluster-glue
 Version:	1.0.11
-Release:	6
+Release:	7
 License:	GPL v2+ and LGPL v2+
 Group:		Aplications/System
 Source0:	http://hg.linux-ha.org/glue/archive/glue-%{version}.tar.bz2
@@ -171,6 +171,8 @@ find $RPM_BUILD_ROOT -name '*.la' -delete
 %{__sed} -e 's;@libdir@;%{_libdir};g' \
 	%{SOURCE1} > $RPM_BUILD_ROOT%{systemdunitdir}/logd.service
 
+%{__rm} -r $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -202,7 +204,7 @@ fi
 
 %files
 %defattr(644,root,root,755)
-%doc AUTHORS ChangeLog logd/logd.cf
+%doc AUTHORS ChangeLog logd/logd.cf doc/stonith/README*
 %attr(754,root,root) /etc/rc.d/init.d/logd
 %{systemdunitdir}/logd.service
 

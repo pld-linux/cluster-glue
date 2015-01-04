@@ -1,0 +1,167 @@
+--- Reusable-Cluster-Components-glue--glue-1.0.11/lib/clplumbing/longclock.c~	2012-10-15 13:58:55.000000000 +0000
++++ Reusable-Cluster-Components-glue--glue-1.0.11/lib/clplumbing/longclock.c	2015-01-04 11:29:17.659862030 +0000
+@@ -68,7 +68,7 @@
+ #	define	TIMES_PARAM	&dummy_longclock_tms_struct
+ #endif
+ 
+-unsigned long
++unsigned long long
+ cl_times(void)	/* Make times(2) behave rationally on Linux */
+ {
+ 	clock_t		ret;
+@@ -114,9 +114,9 @@
+ 	 * because of sign extension.
+ 	 * We do expect sizeof(clock_t) <= sizeof(long), however.
+ 	 */
+-	BUILD_BUG_ON(sizeof(clock_t) > sizeof(unsigned long));
+-#define CLOCK_T_MAX	(~0UL >> (8*(sizeof(unsigned long) - sizeof(clock_t))))
+-	return (unsigned long)ret & CLOCK_T_MAX;
++	BUILD_BUG_ON(sizeof(clock_t) > sizeof(unsigned long long));
++#define CLOCK_T_MAX	(~0UL >> (8*(sizeof(unsigned long long) - sizeof(clock_t))))
++	return (unsigned long long)ret & CLOCK_T_MAX;
+ }
+ 
+ #ifdef CLOCK_T_IS_LONG_ENOUGH
+@@ -143,17 +143,17 @@
+ 	 * because then this can recurse infinitely; that is why the
+ 	 * cl_log call is where it is; found by Simon Graham. */
+ 	static	gboolean	calledbefore	= FALSE;
+-	static	unsigned long	lasttimes	= 0L;
+-	static	unsigned long	callcount	= 0L;
++	static	unsigned long long	lasttimes	= 0L;
++	static	unsigned long long	callcount	= 0L;
+ 	static	longclock_t	lc_wrapcount	= 0L;
+-	unsigned long		timesval;
++	unsigned long long		timesval;
+ 
+ 	++callcount;
+ 
+ 	timesval = cl_times();
+ 
+ 	if (calledbefore && timesval < lasttimes)  {
+-		unsigned long jumpbackby = lasttimes - timesval;
++		unsigned long long jumpbackby = lasttimes - timesval;
+ 
+ 		if (jumpbackby < MINJUMP) {
+ 			/* Kernel weirdness */
+@@ -165,9 +165,9 @@
+ 			,	"%s: old value was %lu"
+ 			", new value is %lu, diff is %lu, callcount %lu"
+ 			,	__FUNCTION__
+-			,	(unsigned long)lasttimes
+-			,	(unsigned long)timesval
+-			,	(unsigned long)jumpbackby
++			,	(unsigned long long)lasttimes
++			,	(unsigned long long)timesval
++			,	(unsigned long long)jumpbackby
+ 			,	callcount);
+ 			/* Assume jump back was the error and ignore it */
+ 			/* (i.e., hope it goes away) */
+@@ -194,10 +194,10 @@
+ #endif	/* ! CLOCK_T_IS_LONG_ENOUGH */
+ 
+ longclock_t
+-msto_longclock(unsigned long ms)
++msto_longclock(unsigned long long ms)
+ {
+-	unsigned long	secs =	ms / 1000UL;
+-	unsigned long	msec = ms % 1000;
++	unsigned long long	secs =	ms / 1000UL;
++	unsigned long long	msec = ms % 1000;
+ 	longclock_t	result;
+ 
+ 	(void)(Hz == 0 && hz_longclock());
+@@ -214,7 +214,7 @@
+ }
+ 
+ longclock_t
+-secsto_longclock(unsigned long Secs)
++secsto_longclock(unsigned long long Secs)
+ {
+ 	longclock_t	secs = Secs;
+ 
+@@ -232,7 +232,7 @@
+ 	
+ }
+ 
+-unsigned long
++unsigned long long
+ longclockto_ms(longclock_t t)
+ {
+ 	(void)(Hz == 0 && hz_longclock());
+@@ -240,13 +240,13 @@
+ 	if (t == 0) {
+ 		return 0UL;
+ 	}
+-	return (unsigned long) ((t*1000UL)/Lc_Hz);
++	return (unsigned long long) ((t*1000UL)/Lc_Hz);
+ }
+ #ifndef CLOCK_T_IS_LONG_ENOUGH
+-long
++long long
+ longclockto_long(longclock_t t)
+ {
+-	return	((long)(t));
++	return	((long long)(t));
+ }
+ 
+ longclock_t
+--- Reusable-Cluster-Components-glue--glue-1.0.11/include/clplumbing/longclock.h~	2012-10-15 13:58:55.000000000 +0000
++++ Reusable-Cluster-Components-glue--glue-1.0.11/include/clplumbing/longclock.h	2015-01-04 11:31:06.843191511 +0000
+@@ -79,7 +79,7 @@
+  *
+  *	extern const longclock_t	zero_longclock;
+  */
+-extern unsigned long cl_times(void);
++extern unsigned long long cl_times(void);
+ 
+ #ifdef CLOCK_T_IS_LONG_ENOUGH
+ #	ifndef	HAVE_LONGCLOCK_ARITHMETIC
+@@ -99,11 +99,11 @@
+ extern const longclock_t	zero_longclock;
+ 
+ unsigned	hz_longclock(void);
+-longclock_t	secsto_longclock(unsigned long);
++longclock_t	secsto_longclock(unsigned long long);
+ longclock_t	dsecsto_longclock(double);
+-longclock_t	msto_longclock(unsigned long);
+-unsigned long	longclockto_ms(longclock_t);		/* Can overflow! */
+-long		longclockto_long(longclock_t);		/* May overflow! */
++longclock_t	msto_longclock(unsigned long long);
++unsigned long long	longclockto_ms(longclock_t);		/* Can overflow! */
++long long		longclockto_long(longclock_t);		/* May overflow! */
+ 
+ 
+ #ifndef HAVE_LONGCLOCK_ARITHMETIC
+@@ -118,7 +118,7 @@
+ 
+ #else /* We HAVE_LONGCLOCK_ARITHMETIC */
+ 
+-#	define	longclockto_long(lc)	((long)(lc))
++#	define	longclockto_long(lc)	((long long)(lc))
+ 
+ #	define	add_longclock(l,r)			\
+ 	((longclock_t)(l) + (longclock_t)(r))
+@@ -136,8 +136,8 @@
+ 
+ /* N.B: Possibly not the best place for this, but it will do for now */
+ /* This is consistent with OpenBSD, and is a good choice anyway */
+-#define TIME_T  unsigned long
+-#define TIME_F  "%lu"
+-#define TIME_X  "%lx"
++#define TIME_T  unsigned long long
++#define TIME_F  "%llu"
++#define TIME_X  "%llx"
+ 
+ #endif
+--- Reusable-Cluster-Components-glue--glue-1.0.11/include/clplumbing/cl_log.h~	2012-10-15 13:58:55.000000000 +0000
++++ Reusable-Cluster-Components-glue--glue-1.0.11/include/clplumbing/cl_log.h	2015-01-04 11:32:27.326522006 +0000
+@@ -19,7 +19,7 @@
+ #	include <glib.h>
+ #	include <syslog.h>
+ 
+-#define TIME_T  unsigned long
++#define TIME_T  unsigned long long
+ #define	HA_FAIL		0
+ #define	HA_OK		1
+ #define	MAXLINE		(512*10)

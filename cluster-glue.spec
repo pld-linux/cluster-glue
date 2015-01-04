@@ -18,6 +18,7 @@ Source0:	http://hg.linux-ha.org/glue/archive/glue-%{version}.tar.bz2
 Source1:	logd.service
 Patch0:		%{name}-link.patch
 Patch1:		%{name}-opt.patch
+Patch2:		x32-long-long-time-types.patch
 URL:		http://www.linux-ha.org/
 BuildRequires:	OpenIPMI-devel >= 1.4
 BuildRequires:	autoconf >= 2.53
@@ -140,6 +141,9 @@ STONITH (Shoot The Other Node In The Head) to interfejs służący do
 %setup -q -n Reusable-Cluster-Components-glue--glue-%{version}
 %patch0 -p1
 %patch1 -p1
+%ifarch x32
+%patch2 -p1
+%endif
 
 sed -i -e's;#!/usr/bin/env \(python\|perl\);#!/usr/bin/\1;' \
 					lib/plugins/stonith/external/*

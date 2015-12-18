@@ -1,13 +1,13 @@
---- Reusable-Cluster-Components-glue--glue-1.0.11/configure.ac.orig	2012-10-15 15:58:55.000000000 +0200
-+++ Reusable-Cluster-Components-glue--glue-1.0.11/configure.ac	2013-09-06 16:26:42.523189874 +0200
-@@ -1199,10 +1199,8 @@
+--- Reusable-Cluster-Components-glue--glue-1.0.12/configure.ac.orig	2015-12-15 22:12:07.252626084 +0100
++++ Reusable-Cluster-Components-glue--glue-1.0.12/configure.ac	2015-12-15 22:14:16.329287335 +0100
+@@ -1223,10 +1223,8 @@
  fi
  
  if test "$GCC" != yes; then
 -        CFLAGS="$CFLAGS -g"
  	enable_fatal_warnings=no
  else
--        CFLAGS="$CFLAGS -ggdb3 -O0"
+-        CFLAGS="$CFLAGS -ggdb"
  
  	# We had to eliminate -Wnested-externs because of libtool changes
          EXTRA_FLAGS="-fgnu89-inline

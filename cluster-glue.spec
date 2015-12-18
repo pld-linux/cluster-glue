@@ -9,17 +9,19 @@
 Summary:	Reusable cluster components
 Summary(pl.UTF-8):	Komponenty klastrowe wielokrotnego użytku
 Name:		cluster-glue
-Version:	1.0.11
-Release:	8
+Version:	1.0.12
+Release:	1
 License:	GPL v2+ and LGPL v2+
 Group:		Aplications/System
+#Source0Download: http://linux-ha.org/wiki/Downloads
 Source0:	http://hg.linux-ha.org/glue/archive/glue-%{version}.tar.bz2
-# Source0-md5:	7d0acd99d43edac849dc76f43cfa4c7f
-Source1:	logd.service
+# Source0-md5:	ec620466d6f23affa3b074b72bca7870
+#Source1:	logd.service
 Patch0:		%{name}-link.patch
 Patch1:		%{name}-opt.patch
-Patch2:		x32-long-long-time-types.patch
-URL:		http://www.linux-ha.org/
+Patch2:		%{name}-rc.patch
+Patch3:		x32-long-long-time-types.patch
+URL:		http://linux-ha.org/wiki/Cluster_Glue
 BuildRequires:	OpenIPMI-devel >= 1.4
 BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake
@@ -141,8 +143,9 @@ STONITH (Shoot The Other Node In The Head) to interfejs służący do
 %setup -q -n Reusable-Cluster-Components-glue--glue-%{version}
 %patch0 -p1
 %patch1 -p1
-%ifarch x32
 %patch2 -p1
+%ifarch x32
+%patch3 -p1
 %endif
 
 sed -i -e's;#!/usr/bin/env \(python\|perl\);#!/usr/bin/\1;' \
@@ -158,9 +161,11 @@ sed -i -e's;#!/usr/bin/env \(python\|perl\);#!/usr/bin/\1;' \
 	--docdir=%{_docdir}/%{name}-%{version} \
 	--disable-fatal-warnings \
 	--disable-static \
+	--enable-ipmilan \
 	--with-daemon-group=haclient \
 	--with-daemon-user=hacluster \
-	--with-initdir=/etc/rc.d/init.d
+	--with-initdir=/etc/rc.d/init.d \
+	--with-rundir=/var/run
 %{__make}
 
 %install
@@ -172,8 +177,8 @@ install -d $RPM_BUILD_ROOT%{systemdunitdir}
 
 find $RPM_BUILD_ROOT -name '*.la' -delete
 
-%{__sed} -e 's;@libdir@;%{_libdir};g' \
-	%{SOURCE1} > $RPM_BUILD_ROOT%{systemdunitdir}/logd.service
+#%{__sed} -e 's;@libdir@;%{_libdir};g' \
+#	%{SOURCE1} > $RPM_BUILD_ROOT%{systemdunitdir}/logd.service
 
 %{__rm} -r $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}
 
@@ -216,7 +221,6 @@ fi
 %attr(755,root,root) %{_sbindir}/hb_report
 %attr(755,root,root) %{_sbindir}/lrmadmin
 %attr(755,root,root) %{_sbindir}/meatclient
-%attr(755,root,root) %{_sbindir}/sbd
 %attr(755,root,root) %{_sbindir}/cibsecret
 %{_mandir}/man1/ha_logger.1*
 %{_mandir}/man8/ha_logd.8*
@@ -228,7 +232,6 @@ fi
 %attr(755,root,root) %{_datadir}/%{name}/ha_cf_support.sh
 %attr(755,root,root) %{_datadir}/%{name}/openais_conf_support.sh
 %attr(755,root,root) %{_datadir}/%{name}/utillib.sh
-%attr(755,root,root) %{_datadir}/%{name}/combine-logs.pl
 %attr(755,root,root) %{_datadir}/%{name}/ha_log.sh
 
 %dir %{_libdir}/heartbeat/plugins/RAExec

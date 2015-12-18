@@ -1,0 +1,20 @@
+--- Reusable-Cluster-Components-glue--glue-1.0.12/logd/Makefile.am.orig	2014-07-18 13:40:19.000000000 +0200
++++ Reusable-Cluster-Components-glue--glue-1.0.12/logd/Makefile.am	2015-12-15 22:20:41.372604508 +0100
+@@ -51,6 +51,5 @@
+ if HAVE_SYSTEMD
+ systemdsystemunit_DATA = \
+         logd.service
+-else
+-initd_SCRIPTS     = logd
+ endif
++initd_SCRIPTS     = logd
+--- Reusable-Cluster-Components-glue--glue-1.0.12/configure.ac.orig	2015-12-16 21:28:55.002442339 +0100
++++ Reusable-Cluster-Components-glue--glue-1.0.12/configure.ac	2015-12-16 21:47:06.725729858 +0100
+@@ -390,6 +390,7 @@
+ AC_DEFINE_UNQUOTED(GLUE_SHARED_DIR,"$GLUE_SHARED_DIR", Location for scripts)
+ AC_SUBST(GLUE_SHARED_DIR)
+ 
++eval eval HA_VARRUNDIR=$GLUE_STATE_DIR
+ AC_DEFINE_UNQUOTED(HA_VARRUNDIR,"$GLUE_STATE_DIR", Where Heartbeat keeps state files and sockets - old name)
+ AC_SUBST(HA_VARRUNDIR)
+ 

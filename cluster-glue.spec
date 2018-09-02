@@ -10,17 +10,17 @@ Summary:	Reusable cluster components
 Summary(pl.UTF-8):	Komponenty klastrowe wielokrotnego użytku
 Name:		cluster-glue
 Version:	1.0.12
-Release:	1
+Release:	2
 License:	GPL v2+ and LGPL v2+
 Group:		Aplications/System
 #Source0Download: http://linux-ha.org/wiki/Downloads
 Source0:	http://hg.linux-ha.org/glue/archive/glue-%{version}.tar.bz2
 # Source0-md5:	ec620466d6f23affa3b074b72bca7870
-#Source1:	logd.service
 Patch0:		%{name}-link.patch
 Patch1:		%{name}-opt.patch
 Patch2:		%{name}-rc.patch
-Patch3:		x32-long-long-time-types.patch
+Patch3:		%{name}-heartbeat-libexecdir.patch
+Patch4:		x32-long-long-time-types.patch
 URL:		http://linux-ha.org/wiki/Cluster_Glue
 BuildRequires:	OpenIPMI-devel >= 1.4
 BuildRequires:	autoconf >= 2.53
@@ -144,8 +144,9 @@ STONITH (Shoot The Other Node In The Head) to interfejs służący do
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
-%ifarch x32
 %patch3 -p1
+%ifarch x32
+%patch4 -p1
 %endif
 
 sed -i -e's;#!/usr/bin/env \(python\|perl\);#!/usr/bin/\1;' \
@@ -157,6 +158,7 @@ sed -i -e's;#!/usr/bin/env \(python\|perl\);#!/usr/bin/\1;' \
 %{__autoheader}
 %{__automake}
 %{__autoconf}
+CPPFLAGS="%{rpmcppflags} -DOPENIPMI_DEFINE_SELECTOR_T"
 %configure \
 	--docdir=%{_docdir}/%{name}-%{version} \
 	--disable-fatal-warnings \
@@ -176,9 +178,6 @@ install -d $RPM_BUILD_ROOT%{systemdunitdir}
 	DESTDIR=$RPM_BUILD_ROOT
 
 find $RPM_BUILD_ROOT -name '*.la' -delete
-
-#%{__sed} -e 's;@libdir@;%{_libdir};g' \
-#	%{SOURCE1} > $RPM_BUILD_ROOT%{systemdunitdir}/logd.service
 
 %{__rm} -r $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}
 
@@ -234,15 +233,16 @@ fi
 %attr(755,root,root) %{_datadir}/%{name}/utillib.sh
 %attr(755,root,root) %{_datadir}/%{name}/ha_log.sh
 
-%dir %{_libdir}/heartbeat/plugins/RAExec
+%attr(755,root,root) %{_libexecdir}/heartbeat/ha_logd
+%attr(755,root,root) %{_libexecdir}/heartbeat/lrmd
+
 %dir %{_libdir}/heartbeat/plugins/InterfaceMgr
-%dir %{_libdir}/heartbeat/plugins/compress
-%attr(755,root,root) %{_libdir}/heartbeat/lrmd
-%attr(755,root,root) %{_libdir}/heartbeat/ha_logd
 %attr(755,root,root) %{_libdir}/heartbeat/plugins/InterfaceMgr/generic.so
+%dir %{_libdir}/heartbeat/plugins/RAExec
 %attr(755,root,root) %{_libdir}/heartbeat/plugins/RAExec/heartbeat.so
 %attr(755,root,root) %{_libdir}/heartbeat/plugins/RAExec/lsb.so
 %attr(755,root,root) %{_libdir}/heartbeat/plugins/RAExec/ocf.so
+%dir %{_libdir}/heartbeat/plugins/compress
 %attr(755,root,root) %{_libdir}/heartbeat/plugins/compress/bz2.so
 %attr(755,root,root) %{_libdir}/heartbeat/plugins/compress/zlib.so
 
@@ -287,12 +287,12 @@ fi
 
 %files tests
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/heartbeat/ipctest
-%attr(755,root,root) %{_libdir}/heartbeat/ipctransientclient
-%attr(755,root,root) %{_libdir}/heartbeat/ipctransientserver
-%attr(755,root,root) %{_libdir}/heartbeat/transient-test.sh
-%attr(755,root,root) %{_libdir}/heartbeat/base64_md5_test
-%attr(755,root,root) %{_libdir}/heartbeat/logtest
+%attr(755,root,root) %{_libexecdir}/heartbeat/ipctest
+%attr(755,root,root) %{_libexecdir}/heartbeat/ipctransientclient
+%attr(755,root,root) %{_libexecdir}/heartbeat/ipctransientserver
+%attr(755,root,root) %{_libexecdir}/heartbeat/transient-test.sh
+%attr(755,root,root) %{_libexecdir}/heartbeat/base64_md5_test
+%attr(755,root,root) %{_libexecdir}/heartbeat/logtest
 
 %dir %{_libdir}/heartbeat/plugins/test
 %attr(755,root,root) %{_libdir}/heartbeat/plugins/test/test.so

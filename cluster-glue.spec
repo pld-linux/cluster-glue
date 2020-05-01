@@ -13,7 +13,9 @@ Version:	1.0.12
 Release:	3
 License:	GPL v2+ and LGPL v2+
 Group:		Aplications/System
-#Source0Download: http://www.linux-ha.org/wiki/Downloads
+# for future releases:
+#Source0Download: https://github.com/ClusterLabs/cluster-glue/releases
+#Source0:	https://github.com/ClusterLabs/cluster-glue/archive/%{version}/glue-%{version}.tar.gz
 Source0:	http://hg.linux-ha.org/glue/archive/glue-%{version}.tar.bz2
 # Source0-md5:	ec620466d6f23affa3b074b72bca7870
 Patch0:		%{name}-link.patch

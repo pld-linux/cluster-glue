@@ -13,7 +13,7 @@ Version:	1.0.12
 Release:	3
 License:	GPL v2+ and LGPL v2+
 Group:		Aplications/System
-#Source0Download: http://linux-ha.org/wiki/Downloads
+#Source0Download: http://www.linux-ha.org/wiki/Downloads
 Source0:	http://hg.linux-ha.org/glue/archive/glue-%{version}.tar.bz2
 # Source0-md5:	ec620466d6f23affa3b074b72bca7870
 Patch0:		%{name}-link.patch
@@ -21,7 +21,7 @@ Patch1:		%{name}-opt.patch
 Patch2:		%{name}-rc.patch
 Patch3:		%{name}-heartbeat-libexecdir.patch
 Patch4:		x32-long-long-time-types.patch
-URL:		http://linux-ha.org/wiki/Cluster_Glue
+URL:		http://www.linux-ha.org/wiki/Cluster_Glue
 BuildRequires:	OpenIPMI-devel >= 1.4
 BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake

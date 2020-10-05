@@ -151,8 +151,11 @@ STONITH (Shoot The Other Node In The Head) to interfejs służący do
 %patch4 -p1
 %endif
 
-sed -i -e's;#!/usr/bin/env \(python\|perl\);#!/usr/bin/\1;' \
-					lib/plugins/stonith/external/*
+%{__sed} -i -e '1{
+	s,^#!.*python$,#!%{__python},
+	s,^#!.*bin/env perl,#!%{__perl},
+}' \
+	lib/plugins/stonith/external/*
 
 %build
 %{__libtoolize}
@@ -162,6 +165,7 @@ sed -i -e's;#!/usr/bin/env \(python\|perl\);#!/usr/bin/\1;' \
 %{__autoconf}
 CPPFLAGS="%{rpmcppflags} -DOPENIPMI_DEFINE_SELECTOR_T"
 %configure \
+	PYTHON=%{__python} \
 	--docdir=%{_docdir}/%{name}-%{version} \
 	--disable-fatal-warnings \
 	--disable-static \

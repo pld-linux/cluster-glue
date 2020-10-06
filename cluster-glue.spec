@@ -10,7 +10,7 @@ Summary:	Reusable cluster components
 Summary(pl.UTF-8):	Komponenty klastrowe wielokrotnego użytku
 Name:		cluster-glue
 Version:	1.0.12
-Release:	4
+Release:	5
 License:	GPL v2+ and LGPL v2+
 Group:		Aplications/System
 # for future releases:

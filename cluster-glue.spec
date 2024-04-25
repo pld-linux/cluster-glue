@@ -25,6 +25,7 @@ Patch3:		%{name}-heartbeat-libexecdir.patch
 Patch4:		x32-long-long-time-types.patch
 URL:		http://www.linux-ha.org/wiki/Cluster_Glue
 BuildRequires:	OpenIPMI-devel >= 1.4
+BuildRequires:	asciidoc
 BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake
 BuildRequires:	bzip2-devel
@@ -48,7 +49,7 @@ BuildRequires:	openhpi-devel
 BuildRequires:	openssl-devel
 BuildRequires:	perl-tools-pod
 BuildRequires:	pkgconfig
-BuildRequires:	python-devel
+BuildRequires:	python3-devel
 BuildRequires:	rpm-pythonprov
 %{?with_vacm:BuildRequires:	vacm-devel}
 BuildRequires:	zlib-devel
@@ -152,7 +153,7 @@ STONITH (Shoot The Other Node In The Head) to interfejs służący do
 %endif
 
 %{__sed} -i -e '1{
-	s,^#!.*python$,#!%{__python},
+	s,^#!.*python$,#!%{__python3},
 	s,^#!.*bin/env perl,#!%{__perl},
 }' \
 	lib/plugins/stonith/external/*
@@ -165,7 +166,7 @@ STONITH (Shoot The Other Node In The Head) to interfejs służący do
 %{__autoconf}
 CPPFLAGS="%{rpmcppflags} -DOPENIPMI_DEFINE_SELECTOR_T"
 %configure \
-	PYTHON=%{__python} \
+	PYTHON=%{__python3} \
 	--docdir=%{_docdir}/%{name}-%{version} \
 	--disable-fatal-warnings \
 	--disable-static \

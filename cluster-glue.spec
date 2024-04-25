@@ -4,6 +4,7 @@
 # - separate some stonith plugins which have external dependencies?
 #
 # Conditional build:
+%bcond_without	systemd	# systemd
 %bcond_without	vacm	# VACM stonith plugin
 #
 Summary:	Reusable cluster components
@@ -221,7 +222,9 @@ fi
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog logd/logd.cf doc/stonith/README*
 %attr(754,root,root) /etc/rc.d/init.d/logd
+%if %{with systemd}
 %{systemdunitdir}/logd.service
+%endif
 
 %attr(755,root,root) %{_sbindir}/ha_logger
 %attr(755,root,root) %{_sbindir}/hb_report
